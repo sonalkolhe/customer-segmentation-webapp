@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Segmentation Tool | Insights Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --hero-bg: #fdfbff; 
+            --section-grey: #f8fafc;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            background-color: #fff;
+            color: var(--text-dark);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            top: 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color: var(--text-dark);
+            font-weight: 500;
+            margin: 0 10px;
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(180deg, #fdfbff 0%, #f5f3ff 100%);
+            padding: 140px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Wave Dividers */
+        .wave-divider {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            transform: rotate(180deg);
+            z-index: 1;
+        }
+
+        .wave-divider svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 100px; 
+        }
+
+        .wave-fill-white { fill: #FFFFFF; }
+        .wave-fill-grey { fill: var(--section-grey); }
+
+        .hero-title {
+            font-weight: 800;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            color: var(--text-dark);
+        }
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Tool Card */
+        .tool-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.1);
+            padding: 40px;
+            border: 1px solid #e2e8f0;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--primary-color);
+            background-color: #eef2ff;
+            transform: scale(1.01);
+        }
+
+        /* Buttons */
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 12px 32px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+            color: white; 
+        }
+        .btn-primary-custom:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+        .btn-primary-custom:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 1;
+        }
+
+        /* Style for active state */
+        .btn-primary-custom:not(:disabled) {
+            background-color: #4f46e5;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-large-cta {
+            padding: 16px 48px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+        }
+        .btn-large-cta:hover {
+            box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.5);
+            transform: translateY(-3px);
+        }
+        
+        .btn-outline-custom {
+            color: var(--text-muted);
+            border: 1px solid #e2e8f0;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            background: white;
+            transition: all 0.2s;
+        }
+        .btn-outline-custom:hover {
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            border-color: #cbd5e1;
+        }
+
+        /* --- INFO SECTIONS --- */
+        .info-section {
+            padding: 80px 0;
+            position: relative;
+        }
+
+        .section-with-wave {
+            padding-bottom: 120px;
+        }
+        
+        .section-after-wave {
+            padding-top: 40px;
+        }
+        
+        .styled-heading-container {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .styled-heading {
+            font-weight: 800;
+            font-size: 2.2rem;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .text-highlight {
+            color: #2563eb;
+        }
+
+        .gradient-underline {
+            height: 5px;
+            width: 80px;
+            background: linear-gradient(90deg, #d946ef 0%, #4f46e5 100%);
+            margin: 0 auto;
+            border-radius: 10px;
+        }
+
+        /* Job Cards */
+        .job-card {
+            background: white;
+            padding: 25px 20px;
+            border-radius: 16px;
+            border: 1px solid #f1f5f9;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            height: 100%;
+        }
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: #e0e7ff;
+        }
+        .job-emoji {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 15px;
+        }
+        .job-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        /* Step Cards */
+        .step-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+        
+        footer {
+            background: var(--section-grey);
+            padding: 40px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-pie-chart-fill text-primary me-2"></i>Segmently
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto me-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#beneficial-for">Who is it for?</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">How it works</a>
+                    </li>
+                </ul>
+                <button class="btn btn-sm btn-primary-custom" onclick="scrollToTool()">Get Started</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-section">
+        <div class="container" style="position: relative; z-index: 5;">
+            <h1 class="hero-title">Unlock Hidden Customer Insights</h1>
+            <p class="hero-subtitle">
+                This tool analyzes customer data based on key demographics, spending habits, and annual income to generate meaningful insights. 
+                <br><br>
+                <strong>Upload your data, and let the tool visualize your ideal target audience.</strong>
+            </p>
+
+            <div id="tool-anchor" class="tool-card">
+                
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <h4 class="mb-0 fw-bold">Analyze Data</h4>
+                    <button class="btn-outline-custom" id="downloadTemplateBtn">
+                        <i class="bi bi-download me-2"></i>Download Template
+                    </button>
+                </div>
+
+                <div id="dropzone" class="drop-zone">
+                    <i class="bi bi-cloud-arrow-up drop-icon" style="font-size: 48px; color: var(--primary-color);"></i>
+                    <h5 class="fw-bold">Drag & Drop your CSV here</h5>
+                    <p class="text-muted mb-0">or click to browse files</p>
+                    <input id="fileInput" type="file" accept=".csv,text/csv" style="display: none;" />
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button class="btn btn-primary btn-primary-custom" id="submitBtn" disabled>
+                        Run Segmentation Analysis
+                    </button>
+                </div>
+                <p class="text-muted text-center mt-3 small">
+                    <i class="bi bi-lock-fill me-1"></i>Your data is processed securely.
+                </p>
+            </div>
+        </div>
+
+        <div class="wave-divider">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="wave-fill-white"></path>
+            </svg>
+        </div>
+    </div>
+
+    <section id="beneficial-for" class="info-section section-with-wave" style="background-color: white;">
+        <div class="container">
+            
+            <div class="styled-heading-container">
+                <h2 class="styled-heading">This Tool Is Right For You If You <span class="text-highlight">Are</span></h2>
+                <div class="gradient-underline"></div>
+            </div>
+            
+            <p class="text-center text-muted mb-5" style="max-width: 600px; margin: 0 auto;">
+                Designed for professionals who need data-driven customer insights
+            </p>
+            
+            <div class="row row-cols-2 row-cols-md-4 g-4">
+                <div class="col"><div class="job-card"><span class="job-emoji">📢</span><h6 class="job-title">Marketing Manager</h6></div></div>
+                <div class="col"><div class="job-card"><span class="job-emoji">💼</span><h6 class="job-title">Business Analyst</h6></div></div>
+                <div class="col"><div class="job-card"><span class="job-emoji">🎯</span><h6 class="job-title">Brand Strategist</h6></div></div>
+                <div class="col"><div class="job-card"><span class="job-emoji">📊</span><h6 class="job-title">Data Analyst</h6></div></div>
+                <div class="col"><div class="job-card"><span class="job-emoji">🚀</span><h6 class="job-title">Growth Marketer</h6></div></div>
+                <div class="col"><div class="job-card"><span class="job-emoji">👔</span><h6 class="job-title">Agency Executive</h6></div></div>
+                <div class="col"><div class="job-card"><span class="job-emoji">💡</span><h6 class="job-title">Product Manager</h6></div></div>
+                <div class="col"><div class="job-card"><span class="job-emoji">📈</span><h6 class="job-title">Sales Director</h6></div></div>
+            </div>
+        </div>
+
+        <div class="wave-divider">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="wave-fill-grey"></path>
+            </svg>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="info-section section-after-wave" style="background-color: var(--section-grey);">
+        <div class="container">
+            
+             <div class="styled-heading-container">
+                <h2 class="styled-heading">How Does It <span class="text-highlight">Work?</span></h2>
+                <div class="gradient-underline"></div>
+            </div>
+
+            <div class="row g-4 mt-3 mb-5">
+                <div class="col-md-6 col-lg-3">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h5 class="fw-bold">Download Template</h5>
+                        <p class="text-muted small">Get our pre-formatted CSV template with all the required fields for customer data analysis.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h5 class="fw-bold">Fill in Your Data</h5>
+                        <p class="text-muted small">Add your customer information including demographics, purchase behavior, and engagement metrics.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h5 class="fw-bold">Upload & Analyze</h5>
+                        <p class="text-muted small">Upload your completed CSV file and let our tool process your data.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h5 class="fw-bold">Get Insights</h5>
+                        <p class="text-muted small">Receive detailed visualizations, segment profiles, and actionable recommendations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <button class="btn btn-primary btn-primary-custom btn-large-cta" onclick="scrollToTool()">
+                    Start Analysis Now <i class="bi bi-arrow-up-circle-fill ms-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container text-center">
+            <p class="mb-0 fw-bold text-dark">Segmently</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Scroll function
+        function scrollToTool() {
+            document.getElementById('tool-anchor').scrollIntoView({behavior: 'smooth'});
+        }
+
+        const dropZone = document.getElementById("dropzone");
+        const fileInput = document.getElementById("fileInput");
+        const submitBtn = document.getElementById("submitBtn");
+        const downloadBtn = document.getElementById("downloadTemplateBtn");
+        let currentFile = null;
+
+        // --- Template Download Logic ---
+        function makeTemplateCSV(withExamples) {
+            // UPDATED: Added 'gender' to the header and examples
+            const header = "customer_id,gender,age,annual_income,spending_score";
+            if (!withExamples) return header + "\n";
+            return [
+                header,
+                "CUST-0001,Male,25,42000,62",
+                "CUST-0002,Female,41,88000,33",
+                "CUST-0003,Male,33,54000,77"
+            ].join("\n") + "\n";
+        }
+
+        downloadBtn.addEventListener("click", () => {
+            const link = document.createElement('a');
+            link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(makeTemplateCSV(true));
+            link.download = 'customer_segmentation_template.csv';
+            link.click();
+        });
+
+        // --- File Handling Logic ---
+        dropZone.addEventListener("click", () => fileInput.click());
+
+        fileInput.addEventListener("change", (e) => {
+            if (e.target.files.length > 0) handleFiles(e.target.files);
+        });
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropZone.classList.add('dragover');
+        }
+
+        function unhighlight() {
+            dropZone.classList.remove('dragover');
+        }
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            const file = files[0];
+            if (!file) return;
+
+            if (!file.name.toLowerCase().endsWith(".csv")) {
+                alert("Please upload a valid .csv file.");
+                return;
+            }
+
+            currentFile = file;
+            
+            dropZone.innerHTML = `
+                <i class="bi bi-file-earmark-spreadsheet-fill text-success" style="font-size: 48px;"></i>
+                <h5 class="fw-bold mt-2">${file.name}</h5>
+                <p class="text-success mb-0">File ready for analysis</p>
+                <button class="btn btn-sm btn-link text-muted mt-2" onclick="location.reload()">Remove</button>
+            `;
+            
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "Run Segmentation Analysis"; 
+        }
+
+        submitBtn.addEventListener("click", function () {
+            if(!currentFile) return;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Processing Data...`;
+            
+            setTimeout(() => {
+                alert(`Data sent to backend!\n\nFile: ${currentFile.name}\nSize: ${currentFile.size} bytes`);
+                submitBtn.innerHTML = "Analysis Complete";
+                submitBtn.disabled = false;
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
