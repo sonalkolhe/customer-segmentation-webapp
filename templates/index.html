@@ -5,11 +5,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Customer Segmentation Tool | Insights Dashboard</title>
-    
+   
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
+   
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
@@ -19,7 +19,7 @@
             --primary-hover: #4338ca;
             --text-dark: #1e293b;
             --text-muted: #64748b;
-            --hero-bg: #fdfbff; 
+            --hero-bg: #fdfbff;
             --section-grey: #f8fafc;
         }
 
@@ -84,7 +84,7 @@
             position: relative;
             display: block;
             width: calc(100% + 1.3px);
-            height: 100px; 
+            height: 100px;
         }
 
         .wave-fill-white { fill: #FFFFFF; }
@@ -142,7 +142,7 @@
             font-weight: 600;
             border-radius: 8px;
             transition: all 0.2s;
-            color: white; 
+            color: white;
         }
         .btn-primary-custom:hover {
             background-color: var(--primary-hover);
@@ -170,7 +170,7 @@
             box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.5);
             transform: translateY(-3px);
         }
-        
+       
         .btn-outline-custom {
             color: var(--text-muted);
             border: 1px solid #e2e8f0;
@@ -194,18 +194,18 @@
         .section-with-wave {
             padding-bottom: 120px;
         }
-        
+       
         .section-after-wave {
             padding-top: 40px;
         }
-        
+       
         .styled-heading-container {
             text-align: center;
             margin-bottom: 50px;
             position: relative;
             z-index: 5;
         }
-        
+       
         .styled-heading {
             font-weight: 800;
             font-size: 2.2rem;
@@ -270,7 +270,7 @@
             margin: 0 auto 20px;
             box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
         }
-        
+       
         footer {
             background: var(--section-grey);
             padding: 40px 0;
@@ -306,32 +306,45 @@
         <div class="container" style="position: relative; z-index: 5;">
             <h1 class="hero-title">Unlock Hidden Customer Insights</h1>
             <p class="hero-subtitle">
-                This tool analyzes customer data based on key demographics, spending habits, and annual income to generate meaningful insights. 
+                This tool analyzes customer data based on key demographics, spending habits, and annual income to generate meaningful insights.
                 <br><br>
                 <strong>Upload your data, and let the tool visualize your ideal target audience.</strong>
             </p>
 
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="alert alert-danger mx-auto" role="alert" style="max-width: 800px;">
+                  {{ messages[0] }}
+                </div>
+              {% endif %}
+            {% endwith %}
+
             <div id="tool-anchor" class="tool-card">
-                
+               
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                     <h4 class="mb-0 fw-bold">Analyze Data</h4>
-                    <button class="btn-outline-custom" id="downloadTemplateBtn">
+                    <button type="button" class="btn-outline-custom" id="downloadTemplateBtn">
                         <i class="bi bi-download me-2"></i>Download Template
                     </button>
                 </div>
 
-                <div id="dropzone" class="drop-zone">
-                    <i class="bi bi-cloud-arrow-up drop-icon" style="font-size: 48px; color: var(--primary-color);"></i>
-                    <h5 class="fw-bold">Drag & Drop your CSV here</h5>
-                    <p class="text-muted mb-0">or click to browse files</p>
-                    <input id="fileInput" type="file" accept=".csv,text/csv" style="display: none;" />
-                </div>
+                <form action="/analyze" method="POST" enctype="multipart/form-data" id="uploadForm">
+                    
+                    <div id="dropzone" class="drop-zone">
+                        <i class="bi bi-cloud-arrow-up drop-icon" style="font-size: 48px; color: var(--primary-color);"></i>
+                        <h5 class="fw-bold">Drag & Drop your CSV here</h5>
+                        <p class="text-muted mb-0">or click to browse files</p>
+                        <input id="fileInput" name="file" type="file" accept=".csv,text/csv" style="display: none;" />
+                    </div>
 
-                <div class="d-grid gap-2 mt-4">
-                    <button class="btn btn-primary btn-primary-custom" id="submitBtn" disabled>
-                        Run Segmentation Analysis
-                    </button>
-                </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-primary-custom" id="submitBtn" disabled>
+                            Run Segmentation Analysis
+                        </button>
+                    </div>
+                    
+                </form>
+
                 <p class="text-muted text-center mt-3 small">
                     <i class="bi bi-lock-fill me-1"></i>Your data is processed securely.
                 </p>
@@ -347,16 +360,16 @@
 
     <section id="beneficial-for" class="info-section section-with-wave" style="background-color: white;">
         <div class="container">
-            
+           
             <div class="styled-heading-container">
                 <h2 class="styled-heading">This Tool Is Right For You If You <span class="text-highlight">Are</span></h2>
                 <div class="gradient-underline"></div>
             </div>
-            
+           
             <p class="text-center text-muted mb-5" style="max-width: 600px; margin: 0 auto;">
                 Designed for professionals who need data-driven customer insights
             </p>
-            
+           
             <div class="row row-cols-2 row-cols-md-4 g-4">
                 <div class="col"><div class="job-card"><span class="job-emoji">📢</span><h6 class="job-title">Marketing Manager</h6></div></div>
                 <div class="col"><div class="job-card"><span class="job-emoji">💼</span><h6 class="job-title">Business Analyst</h6></div></div>
@@ -378,7 +391,7 @@
 
     <section id="how-it-works" class="info-section section-after-wave" style="background-color: var(--section-grey);">
         <div class="container">
-            
+           
              <div class="styled-heading-container">
                 <h2 class="styled-heading">How Does It <span class="text-highlight">Work?</span></h2>
                 <div class="gradient-underline"></div>
@@ -439,16 +452,17 @@
         const fileInput = document.getElementById("fileInput");
         const submitBtn = document.getElementById("submitBtn");
         const downloadBtn = document.getElementById("downloadTemplateBtn");
-        let currentFile = null;
+        const uploadForm = document.getElementById("uploadForm");
 
+        // --- Template Generator ---
         function makeTemplateCSV(withExamples) {
-            const header = "customer_id,gender,age,annual_income,spending_score";
+            const header = "CustomerID,Gender,Age,Annual Income (k$),Spending Score (1-100)";
             if (!withExamples) return header + "\n";
             return [
                 header,
-                "CUST-0001,Male,25,42000,62",
-                "CUST-0002,Female,41,88000,33",
-                "CUST-0003,Male,33,54000,77"
+                "0001,Male,19,15,39",
+                "0002,Male,21,15,81",
+                "0003,Female,20,16,6"
             ].join("\n") + "\n";
         }
 
@@ -459,12 +473,14 @@
             link.click();
         });
 
+        // --- Click to Upload ---
         dropZone.addEventListener("click", () => fileInput.click());
 
         fileInput.addEventListener("change", (e) => {
             if (e.target.files.length > 0) handleFiles(e.target.files);
         });
 
+        // --- Drag & Drop Visuals ---
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropZone.addEventListener(eventName, preventDefaults, false);
         });
@@ -490,9 +506,14 @@
             dropZone.classList.remove('dragover');
         }
 
+        // --- Handle File Drop ---
         dropZone.addEventListener('drop', (e) => {
             const dt = e.dataTransfer;
             const files = dt.files;
+            
+            // Critical: Assign dropped files to the hidden input so the Form can see them
+            fileInput.files = files;
+            
             handleFiles(files);
         });
 
@@ -505,63 +526,39 @@
                 return;
             }
 
-            currentFile = file;
-            
+            // Update UI to show success
             dropZone.innerHTML = `
                 <i class="bi bi-file-earmark-spreadsheet-fill text-success" style="font-size: 48px;"></i>
                 <h5 class="fw-bold mt-2">${file.name}</h5>
                 <p class="text-success mb-0">File ready for analysis</p>
-                <button class="btn btn-sm btn-link text-muted mt-2" onclick="location.reload()">Remove</button>
+                <button type="button" class="btn btn-sm btn-link text-muted mt-2" onclick="location.reload()">Remove</button>
+                <input id="fileInput" name="file" type="file" accept=".csv,text/csv" style="display: none;" />
             `;
             
+            // Note: We have to re-attach the input files if we overwrote the innerHTML
+            // But since we rely on the fileInput element which might have been wiped by innerHTML reset,
+            // we should be careful. 
+            // Better approach used here: We ensure fileInput is part of the innerHTML string or we handle it via the form submission.
+            // A safer trick in JS is to grab the fileInput from the previous DOM state or re-select it.
+            // For simplicity here: we re-injected the input tag above. Now we must re-assign the file object to it.
+            const newExposedInput = document.getElementById('fileInput');
+            
+            // Create a DataTransfer to assign the file back to the new input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            newExposedInput.files = dataTransfer.files;
+
             submitBtn.disabled = false;
-            submitBtn.innerHTML = "Run Segmentation Analysis"; 
+            submitBtn.innerHTML = "Run Segmentation Analysis";
         }
 
-        submitBtn.addEventListener("click", async function () {
-            if(!currentFile) return;
-
+        // --- Submit Handler ---
+        uploadForm.addEventListener("submit", function(e) {
+            // We do NOT prevent default here, because we want the standard POST request to happen
+            // which allows Flask to render the results page.
+            
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Processing Data...`;
-
-            const formData = new FormData();
-            formData.append('file', currentFile);
-
-            try {
-                const incomeRequest = fetch('http://127.0.0.1:5000/api/v1/segment/income', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const ageRequest = fetch('http://127.0.0.1:5000/api/v1/segment/age', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const [incomeResponse, ageResponse] = await Promise.all([incomeRequest, ageRequest]);
-
-                if (!incomeResponse.ok || !ageResponse.ok) {
-                    throw new Error("Failed to process data on server.");
-                }
-
-                const incomeJson = await incomeResponse.json();
-                const ageJson = await ageResponse.json();
-
-                const finalData = {
-                    income: incomeJson.csv_url, 
-                    age: ageJson.csv_url
-                };
-
-                sessionStorage.setItem('segmentationResults', JSON.stringify(finalData));
-
-                window.location.href = 'result.html';
-
-            } catch (error) {
-                console.error("Error:", error);
-                alert("An error occurred while processing your file. Ensure the backend server is running.");
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = "Run Segmentation Analysis";
-            }
         });
     </script>
 </body>
