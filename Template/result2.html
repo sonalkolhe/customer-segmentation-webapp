@@ -201,7 +201,7 @@
                             <div id="income-loading" class="loading-placeholder w-100">
                                 <div class="text-center">
                                     <div class="spinner-border text-primary mb-3" role="status"></div>
-                                    <p>Generating Visualization...</p>
+                                    <p>Loading Data...</p>
                                 </div>
                             </div>
                         </div>
@@ -230,7 +230,7 @@
                             <div id="age-loading" class="loading-placeholder w-100">
                                 <div class="text-center">
                                     <div class="spinner-border text-primary mb-3" role="status"></div>
-                                    <p>Generating Visualization...</p>
+                                    <p>Loading Data...</p>
                                 </div>
                             </div>
                         </div>
@@ -256,71 +256,61 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // ==========================================
-        // MOCK DATA SIMULATION (Matches your model.py output)
-        // In production, you would fetch this from your /api/v1/segment endpoints
-        // ==========================================
-        
-        const mockIncomeResponse = {
-            "csv_url": "/downloads/clustered_income_data.csv",
-            // This is usually a huge string, simplified here for demo
-            "plot_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", 
-            "insights": {
-                "0": {"Age": 45.2, "Annual Income (k$)": 88.5, "Spending Score (1-100)": 18.3, "Size": 35},
-                "1": {"Age": 32.1, "Annual Income (k$)": 55.2, "Spending Score (1-100)": 49.5, "Size": 80},
-                "2": {"Age": 24.5, "Annual Income (k$)": 40.1, "Spending Score (1-100)": 82.0, "Size": 45}
-            }
-        };
-
-        const mockAgeResponse = {
-            "csv_url": "/downloads/clustered_age_data.csv",
-            "plot_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
-            "insights": {
-                "0": {"Age": 19.5, "Annual Income (k$)": 25.0, "Spending Score (1-100)": 75.2, "Size": 30},
-                "1": {"Age": 48.2, "Annual Income (k$)": 65.0, "Spending Score (1-100)": 45.5, "Size": 90},
-                "2": {"Age": 35.0, "Annual Income (k$)": 80.0, "Spending Score (1-100)": 20.0, "Size": 40}
-            }
-        };
-
-        // ==========================================
-        // RENDER LOGIC
-        // ==========================================
-
         document.addEventListener("DOMContentLoaded", () => {
-            // Simulate API delay
-            setTimeout(() => {
-                renderIncomeTab(mockIncomeResponse);
-                renderAgeTab(mockAgeResponse);
-            }, 1000); 
+            // 1. Retrieve Data from Session Storage
+            const storedData = sessionStorage.getItem('segmentationResults');
+
+            if (!storedData) {
+                // If no data is found (user accessed result.html directly), redirect to home
+                alert("No analysis data found. Redirecting to upload page.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const results = JSON.parse(storedData);
+                
+                // 2. Render Both Tabs
+                if (results.income) renderIncomeTab(results.income);
+                if (results.age) renderAgeTab(results.age);
+
+            } catch (error) {
+                console.error("Error parsing results:", error);
+                alert("Error loading results data.");
+            }
         });
 
         function renderIncomeTab(data) {
-            // 1. Set Image (For demo, using a placeholder because base64 string above is 1px)
-            // In real app use: `data.plot_base64`
+            // A. Render Image (Base64)
             const imgEl = document.getElementById('income-plot-img');
-            // For DEMO PURPOSES ONLY: generating a fake placeholder color block
-            imgEl.src = "https://placehold.co/600x400/eef2ff/4f46e5?text=Graph+Generated+by+Python"; 
-            // In Production use: imgEl.src = "data:image/png;base64," + data.plot_base64;
+            const loadingEl = document.getElementById('income-loading');
             
-            imgEl.classList.remove('d-none');
-            document.getElementById('income-loading').classList.add('d-none');
+            // Backend sends raw base64, we need to add the prefix
+            imgEl.src = "data:image/png;base64," + data.plot_base64;
+            
+            imgEl.onload = () => {
+                imgEl.classList.remove('d-none');
+                loadingEl.classList.add('d-none');
+            };
 
-            // 2. Set Download Link
+            // B. Set Download Link
+            // Note: Ensure your Flask app has a route to serve files from /downloads/
             document.getElementById('income-download-btn').href = data.csv_url;
 
-            // 3. Generate Insight Cards
+            // C. Generate Insight Cards
             const container = document.getElementById('income-insights-container');
             container.innerHTML = ""; // Clear existing
 
-            // Iterate through insights dictionary
+            // Data.insights is an object like { "0": {...}, "1": {...} }
             Object.keys(data.insights).forEach(clusterId => {
                 const stats = data.insights[clusterId];
                 
+                // Keys match exactly what is returned from model.py
                 const cardHtml = `
                     <div class="cluster-card">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="cluster-badge">Cluster ${clusterId}</span>
-                            <small class="text-muted"><i class="bi bi-people-fill me-1"></i> ${stats.Size} Customers</small>
+                            <small class="text-muted"><i class="bi bi-people-fill me-1"></i> ${stats.Size || 'N/A'} Customers</small>
                         </div>
                         <div class="row text-center">
                             <div class="col-4 border-end">
@@ -343,30 +333,33 @@
         }
 
         function renderAgeTab(data) {
-            // 1. Set Image
+            // A. Render Image
             const imgEl = document.getElementById('age-plot-img');
-            imgEl.src = "https://placehold.co/600x400/fff7ed/ea580c?text=Age+vs+Spending+Plot"; 
-            // In Production use: imgEl.src = "data:image/png;base64," + data.plot_base64;
+            const loadingEl = document.getElementById('age-loading');
+            
+            imgEl.src = "data:image/png;base64," + data.plot_base64;
+            
+            imgEl.onload = () => {
+                imgEl.classList.remove('d-none');
+                loadingEl.classList.add('d-none');
+            };
 
-            imgEl.classList.remove('d-none');
-            document.getElementById('age-loading').classList.add('d-none');
-
-            // 2. Set Download Link
+            // B. Set Download Link
             document.getElementById('age-download-btn').href = data.csv_url;
 
-            // 3. Generate Insight Cards
+            // C. Generate Insight Cards
             const container = document.getElementById('age-insights-container');
             container.innerHTML = ""; 
 
             Object.keys(data.insights).forEach(clusterId => {
                 const stats = data.insights[clusterId];
                 
-                // Color variation for Age analysis (Orange/Magma theme logic could go here)
+                // Using different accent color (Orange) for Age Analysis
                 const cardHtml = `
                     <div class="cluster-card" style="border-left-color: #ea580c;">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="cluster-badge" style="color: #ea580c; background-color: #fff7ed;">Cluster ${clusterId}</span>
-                            <small class="text-muted"><i class="bi bi-people-fill me-1"></i> ${stats.Size} Customers</small>
+                            <small class="text-muted"><i class="bi bi-people-fill me-1"></i> ${stats.Size || 'N/A'} Customers</small>
                         </div>
                         <div class="row text-center">
                             <div class="col-4 border-end">
